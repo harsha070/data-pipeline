@@ -1,5 +1,6 @@
 import yaml
 import time
+import sys
 import logging
 import schedule
 import datetime
@@ -27,7 +28,7 @@ def run_pipeline(component_sa: object, component_bmt: object, component_merge: o
     time_stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     logging.error(f"Pipeline run started at {time_stamp}!")
 
-    
+
     # run with multithreading
     thread_1 = ReturnValueThread(target=component_sa.process)
     thread_2 = ReturnValueThread(target=component_bmt.process)
@@ -55,7 +56,11 @@ def run_pipeline(component_sa: object, component_bmt: object, component_merge: o
 
 if __name__ == "__main__":
     # load data pipeline configuration
-    pipeline_config = yaml.safe_load(open("./config/pipeline_config_local.yaml"))
+    pipeline_config_file_path = "./config/pipeline_config_local.yaml"
+    if len(sys.argv) > 1:
+        pipeline_config_file_path = sys.argv[1]
+
+    pipeline_config = yaml.safe_load(open(pipeline_config_file_path))
 
     # initialise pipeline components
     component_sa = ProcessSaEvents(

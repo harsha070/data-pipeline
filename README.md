@@ -1,24 +1,25 @@
 ## Setup instructions
 
-```
+```bash
 conda create -n test python=3.8 
 conda activate test
 pip install -r requirements.txt
 brew install wget
 ```
 
-To run the pipeline use the following command,
+## Part 1
 
+To run the data pipeline use the following command,
+
+```bash
+python pipeline.py config/pipeline_config_local.yaml
 ```
-python pipeline.py
-```
 
-## Configuration
+### Configuration File
 
-Update configuration in `config/pipeline_config_local.yaml` files. Example pipeline config and description are given below.
+Example pipeline configuration and description of each field is given below.
 
-### Part 1
-```
+```YAML
 # define properties for sa_events
 sa_events:
   # path for sa_events file (supports url or file pointing to a csv, tsv, xlsx)
@@ -38,8 +39,54 @@ aws:
 job_interval: None # minutes
 ```
 
-### Part II
+
+
+### Part 1 Approach
+
+#### Processing sa_events file
+
+1. Load sa_events file (`sa_events.xlsx`), and map column names to be consistent with the `bmt_events` file. Following mapping is used.
+
 ```
+COLUMN_NAME_MAP = {
+    'Date': 'expected_date_range_begin', 
+    'Drug Name': 'drug_brand_name',
+    'Manufacturer': 'lead_company_name',
+    'Partners': 'partner_company_names',
+    'Event Type': 'event_type',
+    'Details': 'event_title',
+}
+```
+
+2. Add a column `lead_company_ticker` with the lead company stock ticker. To identify the stock ticker, I used the `Manafacturer`/`lead_company_name` column. As most stock tickers are marked within brackets, using a regex pattern, we identify the possible stock tickers from the `Manafacturer`/`lead_company_name` column. For each matched pattern, we check if the pattern is present in the `fsym_to_ticker.csv` mapping to confirm if it is indeed a stock ticker. If found, we assign the value. If not, we assign `None`. 
+
+3. Add a column `partner_company_tickers` with the partner company stock tickers. To identify the partner company stock tickers, we use the `Partners`/`partner_company_names` column. We split the partner company `str` with `||`, as follow the same process as step `2` on each partner company name to get stock ticker. After getting stock tickers, we join them back with `||`
+
+#### Processing bmt_events file
+
+1. Load bmt_events file (`bmt_events.tsv`)
+
+2. `lead_company_ticker` column has the lead company's stock ticker
+
+3. `partner_company_tickers` column has the partner company's stock tickers
+
+#### Merging, saving and uploading
+
+1. Add a column `lead_company_fsym_id` for the `fsym_id` for each company using the mapping file `fsym_to_ticker.tsv`.
+
+2. Add a column `partner_company_fsym_ids` for the `fsym_id` for all partner companies using the mapping file `fsym_to_ticker.tsv`.
+
+## Part 2 Approach
+
+To run the data pipeline use the following command,
+
+```bash
+python pipeline.py config/pipeline_config_api.yaml
+```
+
+### Configuration file for Part II
+
+```YAML
 # define properties for sa_events
 sa_events:
   # path for sa_events file (supports url or file pointing to a csv, tsv, xlsx)
@@ -59,37 +106,14 @@ aws:
 job_interval: 1 # minutes
 ```
 
-## Approach
+### Part 2 Approach
 
-### Processing sa_events file
+#### Define a CRON job schedule for the data pipeline
 
-1. Load sa_events file (`sa_events.xlsx`), and map column names to be consistent with the `bmt_events` file. Following mapping is used.
+1. Using `schedule` library, we run the data pipeline at a specific frequency
+2. As the files are not static, we download the file and compare with existing file to get added and removed rows.
+3. We updated the same rows in the final events csv file
 
-```
-COLUMN_NAME_MAP = {
-    'Date': 'expected_date_range_begin', 
-    'Drug Name': 'drug_brand_name',
-    'Manufacturer': 'lead_company_name',
-    'Partners': 'partner_company_names',
-    'Event Type': 'event_type',
-    'Details': 'event_title',
-}
-```
+#### Upload events csv file AWS S3
 
-2. Add a column `lead_company_ticker` with the lead company stock ticker. To identify the stock ticker, I used the `Manafacturer`/`lead_company_name` column. As most stock tickers are marked within brackets, using a regex pattern, we identify the possible stock tickers from the `Manafacturer`/`lead_company_name` column. For each matched pattern, we check if the pattern is present in the `fsym_to_ticker.csv` mapping to confirm if it is indeed a stock ticker. If found, we assign the value. If not, we assign `None`. 
-
-3. Add a column `partner_company_tickers` with the partner company stock tickers. To identify the partner company stock tickers, we use the `Partners`/`partner_company_names` column. We split the partner company `str` with `||`, as follow the same process as step `2` on each partner company name to get stock ticker. After getting stock tickers, we join them back with `||`
-
-### Processing bmt_events file
-
-1. Load bmt_events file (`bmt_events.tsv`)
-
-2. `lead_company_ticker` column has the lead company's stock ticker
-
-3. `partner_company_tickers` column has the partner company's stock tickers
-
-### Merging, saving and uploading
-
-1. Add a column `lead_company_fsym_id` for the `fsym_id` for each company using the mapping file `fsym_to_ticker.tsv`.
-
-2. Add a column `partner_company_fsym_ids` for the `fsym_id` for all partner companies using the mapping file `fsym_to_ticker.tsv`.
+1. Using `boto3` library, we upload the final events csv file to `S3`. Uses the `s3_access_key` and `s3_access_secret` specified in the configuration yaml file.
