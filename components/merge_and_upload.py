@@ -15,6 +15,7 @@ class MergeEvents(object):
         self.s3_secret_key = kwargs.get(AWS, {}).get(S3_SECRET_KEY, None)
         self.stock_ticker_map = load_fsym_to_ticker_map(kwargs.get(FSYM))
         self.upload_to_s3 = kwargs.get(UPLOAD_TO_S3, False)
+        self.output_path = kwargs.get(OUTPUT_PATH, "events.csv")
 
     def process(self, added_df_list, deleted_df_list):
 
@@ -35,7 +36,7 @@ class MergeEvents(object):
         self.state["lead_company_fsym_id"] = self.state["lead_company_ticker"].apply(lambda text: map_stock_ticker_to_fsym_id(text, self.stock_ticker_map))
         self.state["partner_company_fsym_ids"] = self.state["partner_company_tickers"].apply(lambda text: map_partner_stock_tickers_to_fsym_ids(text, self.stock_ticker_map))
 
-        self.state.to_csv("./events.csv")
+        self.state.to_csv(self.output_path)
 
         logging.error(f"events: {self.state}")
         
@@ -43,7 +44,7 @@ class MergeEvents(object):
             s3_client = get_s3_client(self.s3_access_key, self.s3_secret_key)
             # Set up the bucket and object key
             bucket_name = 's3_disk'
-            object_key = './events.csv'
+            object_key = self.output_path
             # Upload the file to S3
             s3_client.upload_file('events.csv', bucket_name, object_key)
 

@@ -5,6 +5,7 @@ S3_ACCESS_KEY = "s3_access_key"
 S3_SECRET_KEY = "s3_secret_key"
 FSYM = "fsym"
 UPLOAD_TO_S3 = "upload_to_s3"
+OUTPUT_PATH = "output_path"
 SA_COLUMNS = [
     'expected_date_range_begin', 
     'drug_brand_name', 

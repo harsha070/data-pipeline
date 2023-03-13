@@ -7,12 +7,28 @@ pip install -r requirements.txt
 brew install wget
 ```
 
+```bash
+python pipeline.py --help
+
+usage: Data Pipeline [-h] [--config CONFIG] [--output_path OUTPUT_PATH]
+
+Collects clinical trial event data. Assigns stock tickers and fsym_ids for a company and its partner companies
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --config CONFIG
+  --output_path OUTPUT_PATH
+
+Thank you!
+
+```
+
 ## Part 1
 
 To run the data pipeline use the following command,
 
 ```bash
-python pipeline.py config/pipeline_config_local.yaml
+python pipeline.py --config config/pipeline_config_local.yaml --output_path events.csv
 ```
 
 ### Configuration File
@@ -81,7 +97,7 @@ COLUMN_NAME_MAP = {
 To run the data pipeline use the following command,
 
 ```bash
-python pipeline.py config/pipeline_config_api.yaml
+python pipeline.py --config config/pipeline_config_api.yaml --output_path events.csv
 ```
 
 ### Configuration file for Part II

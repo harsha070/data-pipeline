@@ -2,6 +2,7 @@ import yaml
 import time
 import sys
 import logging
+import argparse
 import schedule
 import datetime
 from typing import *
@@ -55,12 +56,19 @@ def run_pipeline(component_sa: object, component_bmt: object, component_merge: o
 
 
 if __name__ == "__main__":
-    # load data pipeline configuration
-    pipeline_config_file_path = "./config/pipeline_config_local.yaml"
-    if len(sys.argv) > 1:
-        pipeline_config_file_path = sys.argv[1]
 
-    pipeline_config = yaml.safe_load(open(pipeline_config_file_path))
+    parser = argparse.ArgumentParser(
+        prog='Data Pipeline', 
+        description='Collects clinical trial event data. Assigns stock tickers and fsym_ids for a company and its partner companies', 
+        epilog='Thank you!'
+    )
+
+    parser.add_argument('--config', default='config/pipeline_config_local.yaml')      # option that takes a value
+    parser.add_argument('--output_path', default='events.csv')  # on/off flag
+
+    args = parser.parse_args()
+
+    pipeline_config = yaml.safe_load(open(args.config))
 
     # initialise pipeline components
     component_sa = ProcessSaEvents(
@@ -73,6 +81,7 @@ if __name__ == "__main__":
     )
     component_merge = MergeEvents(
         **pipeline_config,
+        output_path=args.output_path,
     )
 
     run_pipeline(component_sa, component_bmt, component_merge)
