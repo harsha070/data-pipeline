@@ -112,7 +112,7 @@ job_interval: 1 # minutes
 
 1. Using `schedule` library, we run the data pipeline at a specific frequency
 2. As the files are not static, we download the file and compare with existing file to get added and removed rows.
-3. We updated the same rows in the final events csv file
+3. We compile the added rows and deleted rows, and the final events csv file
 
 #### Upload events csv file AWS S3
 
