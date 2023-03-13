@@ -29,6 +29,15 @@ Thank you!
 
 ## Sample output
 
+`lead_company_name` : name of lead company / manufacturer
+`lead_company_ticker`: stock ticker of lead company
+`lead_company_fsym_id`: fsym id of lead company
+`partner_company_names`: name of partner companies / manufacturers
+`partner_company_tickers`: stock tickers of partner companies / manufacturers
+`partner_company_fsym_ids`: fsym ids of partner companies
+`event_type`: type of event
+`event_title`: title of event
+
 
 |    |   Unnamed: 0 | expected_date_range_begin   | drug_brand_name   | lead_company_name                                                  | partner_company_names                                                              | event_type          | event_title                                                    | lead_company_ticker   | partner_company_tickers   |   event_id |   event_phase |   event_status |   expected_date_range_end |   drug_generic_name |   indication | lead_company_fsym_id   | partner_company_fsym_ids   |
 |---:|-------------:|:----------------------------|:------------------|:-------------------------------------------------------------------|:-----------------------------------------------------------------------------------|:--------------------|:---------------------------------------------------------------|:----------------------|:--------------------------|-----------:|--------------:|---------------:|--------------------------:|--------------------:|-------------:|:-----------------------|:---------------------------|
