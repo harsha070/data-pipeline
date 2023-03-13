@@ -1,0 +1,14 @@
+sa_events:
+  source: 'data/sa_events.xlsx'
+  source_type: 'static'
+bmt_events:
+  source: 'data/bmt_events.tsv'
+  source_type: 'static'
+fsym: '/Users/harsha/Documents/jobs/qls/data/fsym_to_ticker.tsv'
+
+# Define your AWS credentials
+aws:
+  access_key: 'admin'
+  secret_key: 'password'
+
+cron_frequency: 30 # minutes
