@@ -41,9 +41,7 @@ def run_pipeline(component_sa: object, component_bmt: object, component_merge: o
     thread_2.join()
 
     added_df_sa, deleted_df_sa = thread_1.result
-    print(f"added_df_sa: {added_df_sa} deleted_df_sa: {deleted_df_sa}")
     added_df_bmt, deleted_df_bmt = thread_2.result
-    print(f"added_df_bmt: {added_df_bmt} deleted_df_bmt: {deleted_df_bmt}")
 
     # merge events
     # upload to s3, export to local disk

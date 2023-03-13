@@ -1,4 +1,5 @@
 import sys
+import logging
 import threading
 
 
@@ -20,7 +21,7 @@ class ReturnValueThread(threading.Thread):
         try:
             self.result = self._target(*self._args, **self._kwargs)
         except Exception as exc:
-            print(f'{type(exc).__name__}: {exc}', file=sys.stderr)  # properly handle the exception
+            logging.error(f'{type(exc).__name__}: {exc}', file=sys.stderr)  # properly handle the exception
 
     def join(self, *args, **kwargs):
         super().join(*args, **kwargs)
