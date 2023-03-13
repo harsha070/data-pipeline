@@ -4,7 +4,7 @@ sa_events:
 bmt_events:
   source: 'data/bmt_events.tsv'
   source_type: 'static'
-fsym: '/Users/harsha/Documents/jobs/qls/data/fsym_to_ticker.tsv'
+fsym: 'data/fsym_to_ticker.tsv'
 upload_to_s3: True
 
 # Define your AWS credentials
