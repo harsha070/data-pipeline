@@ -61,8 +61,8 @@ if __name__ == "__main__":
         epilog='Thank you!'
     )
 
-    parser.add_argument('--config', default='config/pipeline_config_local.yaml')      # option that takes a value
-    parser.add_argument('--output_path', default='events.csv')  # on/off flag
+    parser.add_argument('--config', default='config/pipeline_config_local.yaml', help='configuration file for the data pipeline. configuration file is used to set sa events file path, bmt events file path, fsym_to_ticker map, pipeline frequency, aws s3 credentials')      # option that takes a value
+    parser.add_argument('--output_path', default='events.csv', help='where to save output events csv file on disk')  # on/off flag
 
     args = parser.parse_args()
 
