@@ -3,17 +3,31 @@ import time
 import logging
 import schedule
 import datetime
+from typing import *
 
-from process_bmt import ProcessBmtEvents
-from process_sa import ProcessSaEvents
-from merge_and_upload import MergeEvents
-from return_thread import ReturnValueThread
+from components.process_bmt import ProcessBmtEvents
+from components.process_sa import ProcessSaEvents
+from components.merge_and_upload import MergeEvents
+from utils.return_thread import ReturnValueThread
 
 
-def run_pipeline(component_sa, component_bmt, component_merge):
+def run_pipeline(component_sa: object, component_bmt: object, component_merge: object) -> None:
+    """runs the data pipeline
+
+    Parameters
+    ----------
+    component_sa : object
+        process sa events file
+    component_bmt : object
+        process bmt events file
+    component_merge : object
+        merges and saves/uploads events.csv file
+    """
     
     time_stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    logging.debug(f"Running pipeline at {time_stamp}!")
+    logging.error(f"Pipeline run started at {time_stamp}!")
+
+    
     # run with multithreading
     thread_1 = ReturnValueThread(target=component_sa.process)
     thread_2 = ReturnValueThread(target=component_bmt.process)
@@ -25,7 +39,9 @@ def run_pipeline(component_sa, component_bmt, component_merge):
     thread_2.join()
 
     added_df_sa, deleted_df_sa = thread_1.result
+    print(f"added_df_sa: {added_df_sa} deleted_df_sa: {deleted_df_sa}")
     added_df_bmt, deleted_df_bmt = thread_2.result
+    print(f"added_df_bmt: {added_df_bmt} deleted_df_bmt: {deleted_df_bmt}")
 
     # merge events
     # upload to s3, export to local disk
@@ -34,20 +50,20 @@ def run_pipeline(component_sa, component_bmt, component_merge):
         deleted_df_list=[deleted_df_sa, deleted_df_bmt]
     )
 
+    logging.error(f"Pipeline run complete at {time_stamp}!")
+
 
 if __name__ == "__main__":
     # load data pipeline configuration
-    pipeline_config = yaml.safe_load(open("./pipeline_config_local.yaml"))
+    pipeline_config = yaml.safe_load(open("./config/pipeline_config_local.yaml"))
 
     # initialise pipeline components
     component_sa = ProcessSaEvents(
         source=pipeline_config['sa_events']['source'], 
-        source_type=pipeline_config['sa_events']['source_type'],
         **pipeline_config,
     )
     component_bmt = ProcessBmtEvents(
         source=pipeline_config['bmt_events']['source'], 
-        source_type=pipeline_config['bmt_events']['source_type'],
         **pipeline_config,
     )
     component_merge = MergeEvents(
@@ -57,10 +73,11 @@ if __name__ == "__main__":
     run_pipeline(component_sa, component_bmt, component_merge)
 
     job_interval = pipeline_config["job_interval"]
-    schedule.every(job_interval).minutes.do(run_pipeline, component_sa, component_bmt, component_merge)
+    if job_interval is not None:
+        schedule.every(job_interval).minutes.do(run_pipeline, component_sa, component_bmt, component_merge)
 
-    while True: 
-        # Checks whether a scheduled task
-        # is pending to run or not
-        schedule.run_pending()
-        time.sleep(1)
+        while True:
+            # Checks whether a scheduled task
+            # is pending to run or not
+            schedule.run_pending()
+            time.sleep(5)
