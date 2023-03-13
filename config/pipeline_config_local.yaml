@@ -25,4 +25,4 @@ aws:
 
 
 # cron job frequency (in minutes). Set to run the data pipeline runs every 1 minute.
-job_interval: 1 # minutes
+job_interval: None # minutes

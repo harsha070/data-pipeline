@@ -98,9 +98,9 @@ COLUMN_NAME_MAP = {
 }
 ```
 
-2. Add a column `lead_company_ticker` with the lead company stock ticker. To identify the stock ticker, I used the `Manafacturer`/`lead_company_name` column. As most stock tickers are marked within brackets, using a regex pattern, we identify the possible stock tickers from the `Manafacturer`/`lead_company_name` column. For each matched pattern, we check if the pattern is present in the `fsym_to_ticker.csv` mapping to confirm if it is indeed a stock ticker. If found, we assign the value. If not, we assign `None`. 
+2. Add a column `lead_company_ticker` with the lead company stock ticker. To identify the stock ticker, I used the `Manafacturer`/`lead_company_name` column. As most stock tickers are marked within brackets, using a regex pattern, I identified the possible stock tickers from the `Manafacturer`/`lead_company_name` column. For each matched pattern, I checked if the pattern is present in the `fsym_to_ticker.csv` mapping to confirm if it is indeed a stock ticker. If found, value is assigned. If not, `None`. 
 
-3. Add a column `partner_company_tickers` with the partner company stock tickers. To identify the partner company stock tickers, we use the `Partners`/`partner_company_names` column. We split the partner company `str` with `||`, as follow the same process as step `2` on each partner company name to get stock ticker. After getting stock tickers, we join them back with `||`
+3. Add a column `partner_company_tickers` with the partner company stock tickers. To identify the partner company stock tickers, I used the `Partners`/`partner_company_names` column. I split the partner company `str` with `||`, as follow the same process as step `2` on each partner company name to get stock ticker. After getting stock tickers, I joined them back with `||`
 
 #### Processing bmt_events file
 
@@ -150,10 +150,10 @@ job_interval: 1 # minutes
 
 #### Define a CRON job schedule for the data pipeline
 
-1. Using `schedule` library, we run the data pipeline at a specific frequency
-2. As the files are not static, we download the file and compare with existing file to get added and removed rows.
-3. We compile the added rows and deleted rows, and the final events csv file
+1. Using `schedule` library, I run the data pipeline at a specific frequency
+2. As the files are not static, I download the file and compare with existing file to get added and removed rows.
+3. Compiled the added rows and deleted rows, and the final events csv file
 
 #### Upload events csv file AWS S3
 
-1. Using `boto3` library, we upload the final events csv file to `S3`. Uses the `s3_access_key` and `s3_access_secret` specified in the configuration yaml file.
+1. Using `boto3` library, I can upload the final events csv file to `S3`. Uploading to `S3` uses the `s3_access_key` and `s3_access_secret` specified in the configuration yaml file.

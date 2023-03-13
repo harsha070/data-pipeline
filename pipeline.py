@@ -85,7 +85,7 @@ if __name__ == "__main__":
     run_pipeline(component_sa, component_bmt, component_merge)
 
     job_interval = pipeline_config["job_interval"]
-    if job_interval is not None:
+    if job_interval is not None and job_interval != 'None':
         schedule.every(job_interval).minutes.do(run_pipeline, component_sa, component_bmt, component_merge)
 
         while True:
