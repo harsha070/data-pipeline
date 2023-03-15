@@ -75,7 +75,7 @@ upload_to_s3: False
 aws:
   s3_access_key: admin
   s3_secret_key: password
-# cron job frequency (in minutes). Set to run the data pipeline runs every 1 minute. If you want to run only once, set to None.
+# cron job frequency (in minutes). If you want to run only once, set to None.
 job_interval: None # minutes
 ```
 
